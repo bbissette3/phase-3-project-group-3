@@ -13,5 +13,5 @@ if __name__ == "__main__":
     
 
 
-    start_menu()
+    start_menu(session)
 

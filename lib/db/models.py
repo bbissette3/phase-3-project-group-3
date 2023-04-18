@@ -19,8 +19,7 @@ class Armor(Base):
     characters = relationship("Character", backref=backref("armor"))
 
     def __repr__(self):
-        return f"Id: {self.id}, " \
-            + f"Name: {self.name}, " \
+        return f"Name: {self.name}, " \
             + f"Speed: {self.speed}, " \
             + f"Defense: {self.defense}"
     
@@ -34,8 +33,7 @@ class Weapon(Base):
     characters = relationship("Character", backref=backref("weapon"))
 
     def __repr__(self):
-        return f"Id: {self.id}, " \
-            + f"Name: {self.name}, " \
+        return f"Name: {self.name}, " \
             + f"Speed: {self.speed}, " \
             + f"Damage: {self.damage}"
     
@@ -49,8 +47,7 @@ class Specialty(Base):
     characters = relationship("Character", backref="specialty")
 
     def __repr__(self):
-        return f"Id: {self.id}, " \
-            + f"Name: {self.name}, " \
+        return f"Name: {self.name}, " \
             + f"Defense: {self.defense}, " \
             + f"Damage: {self.damage}"
     
@@ -69,15 +66,14 @@ class Character(Base):
     user_id = Column(Integer(), ForeignKey("users.id"))
 
     def __repr__(self):
-        return f"Id: {self.id}, " \
-            + f"Name: {self.name}, " \
-            + f"Defense: {self.defense}, " \
-            + f"Damage: {self.damage}," \
-            + f"Health: {self.health}," \
-            + f"Armor Id: {self.armor_id}, " \
-            + f"Weapon Id: {self.weapon_id}, " \
-            + f"Speialty Id: {self.specialty_id}, " \
-            + f"User Id: {self.user_id}"
+        return f"Name: {self.name}, \n" \
+            + f"Defense: {self.defense}, \n" \
+            + f"Damage: {self.damage},\n" \
+            + f"Health: {self.health},\n" \
+            + f"Armor= {self.armor}, \n" \
+            + f"Weapon= {self.weapon}, \n" \
+            + f"Speialty= {self.specialty}, \n" \
+
     
 class User(Base):
     __tablename__ = "users"

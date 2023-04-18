@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import (Base, Armor, Weapon, Specialty, Character, User)
+from models import (Base, Armor, Weapon, Specialty, Character, User)
 
 if __name__ == "__main__":
     engine = create_engine("sqlite:///character_builder.db")
