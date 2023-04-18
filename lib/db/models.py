@@ -19,7 +19,7 @@ class Armor(Base):
     characters = relationship("Character", backref=backref("armor"))
 
     def __repr__(self):
-        return f"Name: {self.name}, " \
+        return f"Type: {self.name}, " \
             + f"Speed: {self.speed}, " \
             + f"Defense: {self.defense}"
     
@@ -33,7 +33,7 @@ class Weapon(Base):
     characters = relationship("Character", backref=backref("weapon"))
 
     def __repr__(self):
-        return f"Name: {self.name}, " \
+        return f"Type: {self.name}, " \
             + f"Speed: {self.speed}, " \
             + f"Damage: {self.damage}"
     
@@ -47,7 +47,7 @@ class Specialty(Base):
     characters = relationship("Character", backref="specialty")
 
     def __repr__(self):
-        return f"Name: {self.name}, " \
+        return f"Type: {self.name}, " \
             + f"Defense: {self.defense}, " \
             + f"Damage: {self.damage}"
     
