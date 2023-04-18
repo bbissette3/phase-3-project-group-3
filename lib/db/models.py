@@ -46,7 +46,7 @@ class Specialty(Base):
     name = Column(String())
     defense = Column(Integer())
     damage = Column(Integer())
-    characters = relationship("Character", backref=backref("specialty"))
+    characters = relationship("Character", backref="specialty")
 
     def __repr__(self):
         return f"Id: {self.id}, " \
@@ -72,8 +72,8 @@ class Character(Base):
         return f"Id: {self.id}, " \
             + f"Name: {self.name}, " \
             + f"Defense: {self.defense}, " \
-            + f"Damage: {self.damage}", \
-            + f"Health: {self.health}", \
+            + f"Damage: {self.damage}," \
+            + f"Health: {self.health}," \
             + f"Armor Id: {self.armor_id}, " \
             + f"Weapon Id: {self.weapon_id}, " \
             + f"Speialty Id: {self.specialty_id}, " \
@@ -84,7 +84,7 @@ class User(Base):
 
     id = Column(Integer(), primary_key=True)
     username = Column(String())
-    characters = relationship("Character", backref=backref("user"))
+    characters = relationship("Character", backref="user")
 
     def __repr__(self):
         return f"Username: {self.username}"
