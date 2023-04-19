@@ -122,10 +122,18 @@ o+o \ / \0                      0/ \ / (=)
 # Character Section
 def character_menu():
     os.system("clear")
+    current_character = ''
+    
+
+    if user_character:
+        current_character = user_character.name
+    else:
+        current_character = "None"
     
 
     print( 
         f"==== Character Menu ==== \n" 
+        + f"Current Character: {current_character} \n"
         + f"--- Select an Option --- \n"
         + f"1. Select Character\n"
         + f"2. Create Character \n"
@@ -152,7 +160,10 @@ def character_menu():
 def select_character():
     os.system("clear")
     print("Choose a Character")
-    print(user_session.query(Character).all())
+    # print(user_session.query(Character).all())
+    for char in user_session.query(Character).all():
+        print()
+        print(char)
     print("Type in Character Name")
     character_list = [character.name for character in user_session.query(Character).all()]
     response = get_user_input(character_list)

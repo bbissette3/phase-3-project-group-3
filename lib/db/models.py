@@ -67,9 +67,11 @@ class Character(Base):
 
     def __repr__(self):
         return f"Name: {self.name}, \n" \
-            + f"Defense: {self.defense}, \n" \
-            + f"Damage: {self.damage},\n" \
-            + f"Health: {self.health},\n" \
+            + f"====== Stats ====== \n" \
+            + f"Defense: {self.defense} ({self.defense + self.armor.defense + self.specialty.defense}) \n" \
+            + f"Damage: {self.damage} ({self.damage + self.weapon.damage + self.specialty.damage})\n" \
+            + f"Health: {self.health} ({self.defense + self.armor.defense})\n" \
+            + f"==== Equip \ Specialty ==== \n" \
             + f"Armor= {self.armor}, \n" \
             + f"Weapon= {self.weapon}, \n" \
             + f"Speialty= {self.specialty}, \n" \
