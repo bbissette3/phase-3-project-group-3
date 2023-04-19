@@ -62,7 +62,7 @@ if __name__ == "__main__":
     session.query(Character).delete()
     session.commit()
 
-    kirby = Character(name="Kirby", defense=10, damage=9, speed=5, health=10, armor_id=gold.id, weapon_id=tasergun.id, specialty_id=liar.id, user_id=trollbot.id)
+    kirby = Character(name="Kirby", defense=10, damage=9, speed=5, health=50, armor_id=gold.id, weapon_id=tasergun.id, specialty_id=liar.id, user_id=trollbot.id)
 
     session.add(kirby)
     session.commit()
