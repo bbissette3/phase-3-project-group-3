@@ -288,15 +288,22 @@ def update_character():
     print("Enter Characters New Name.")
     response = get_user_input(True)
     update_character_name.name = response
+    # user_session.commit()
     character_menu()
 
 def delete_character():
     os.system("clear")
+    global user_character
     character_list =[user.name for user in user_account.characters]
     print(character_list)
     print("==Type in Character to DELETE==")
     response = get_user_input(character_list)
+
+    if response == user_character.name:
+        user_character = False
     delete_character_obj = user_session.query(Character).filter(Character.name== response).delete()
+    user_session.commit()
+    
     character_menu()
 
 
