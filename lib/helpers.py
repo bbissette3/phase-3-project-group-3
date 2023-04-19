@@ -288,7 +288,7 @@ def update_character():
     print("Enter Characters New Name.")
     response = get_user_input(True)
     update_character_name.name = response
-    # user_session.commit()
+    user_session.commit()
     character_menu()
 
 def delete_character():
