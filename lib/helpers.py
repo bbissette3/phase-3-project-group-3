@@ -16,6 +16,7 @@ def input_centered(terminal_width):
     return input()
 
 def get_user_input(choices, terminal_width):
+
     response = input_centered(terminal_width).title()
     if 1 <= len(response) <= 25 and choices == True or response in choices:
         return response
@@ -75,7 +76,8 @@ def log_in(first_user):
 
     user_names = [user.username.title() for user in user_session.query(User).all()]
     response = get_user_input(user_names, width)
-
+  
+   
     global user_account
     user = user_session.query(User).filter(User.username == response).first()
 
@@ -91,7 +93,7 @@ def create_account():
     response = input()
 
     global user_account
-    user_account = User(username = response)
+    user_account = User(username = response.title())
 
     user_session.add(user_account)
     user_session.commit()
@@ -111,7 +113,7 @@ def main_menu():
     print_centered("1. Character Selection", width)
     print_centered("2. Battle", width)
     print_centered("3. About", width)
-    print_centered("4. Log Out", width)
+    print_centered("4. amyLog Out", width)
     print()
 
     print_centered("Please Enter 1, 2, 3 or 4", width)
@@ -360,11 +362,17 @@ def playver_v_player():
     os.system('clear')
     global user_account_two
     global user_character_two
-
-    user_account_two = log_in(False)
-    user_character_two = select_character(False)
-    battle_mode('0')
-    battle_menu()
+    if user_character:
+        user_account_two = log_in(False)
+        user_character_two = select_character(False)
+        battle_mode('0')
+        battle_menu()
+    else:
+        print_centered("== YOU MUST SELECT A CHARACTER FIRST ==", width)
+        print()
+        print_centered("Moving to Character Menu ...", width)
+        time.sleep(3)
+        character_menu()
 
 def player_v_cpu():
     os.system('clear')
