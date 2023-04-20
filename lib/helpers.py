@@ -4,6 +4,7 @@ import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.models import (Base, Armor, Weapon, Specialty, Character, User)
+from asceii import (chainsaw, taser_gun, poison_gas, chain_ball_whip, weapons_vault)
 
 
 user_session = False
