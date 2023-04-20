@@ -2,7 +2,7 @@ import os
 import time
 import random
 from db.models import (Base, Armor, Weapon, Specialty, Character, User)
-from asceii import (chainsaw, taser_gun, poison_gas, chain_ball_whip, weapons_vault)
+from asceii import (chainsaw, taser_gun, poison_gas, chain_ball_whip, weapons_vault, about_us)
 
 user_session = False
 user_account = False
@@ -10,13 +10,18 @@ user_account_two = False
 user_character = False
 user_character_two = False
 
-def get_user_input(choices):
-    response = input()
-    if 1<= len(response) <= 25 and choices == True or response in choices:
+def input_centered(terminal_width):
+    padding = terminal_width // 2
+    print(" " * padding, end="")
+    return input()
+
+def get_user_input(choices, terminal_width):
+    response = input_centered(terminal_width).title()
+    if 1 <= len(response) <= 25 and choices == True or response in choices:
         return response
     else:
         print("Please Try Again")
-        return get_user_input(choices)
+        return get_user_input(choices, terminal_width)
 
 def print_centered(text, terminal_width):
     padding = (terminal_width - len(text)) // 2
@@ -48,7 +53,7 @@ def start_menu(session):
     print_centered("2. Login to Account", width)
     print_centered("Please Enter 1, 2, or q", width)
     
-    response = get_user_input(["1", "2", "q"])
+    response = get_user_input(["1", "2", "q"], width)
 
     if response == "1":
         create_account()
@@ -56,6 +61,7 @@ def start_menu(session):
         log_in(True)
     elif response == "q":
         return
+
 
 
 def log_in(first_user):
@@ -67,8 +73,8 @@ def log_in(first_user):
         print_centered(user_string, width)
     print_centered("Please Enter Your Username", width)
 
-    user_names = [user.username for user in user_session.query(User).all()]
-    response = get_user_input(user_names)
+    user_names = [user.username.title() for user in user_session.query(User).all()]
+    response = get_user_input(user_names, width)
 
     global user_account
     user = user_session.query(User).filter(User.username == response).first()
@@ -109,7 +115,7 @@ def main_menu():
     print()
 
     print_centered("Please Enter 1, 2, 3 or 4", width)
-    response = get_user_input(["1", "2", "3", "4"])
+    response = get_user_input(["1", "2", "3", "4"], width)
 
     if response == "1":
         character_menu()
@@ -129,21 +135,7 @@ def log_out():
 
 def about():
     os.system("clear")
-    ascii_art = '''
-                ====Created By==== 
-            *_   _   _   _   _   _ * 
-    ^       | `_' `-' `_' `-' `_' `|       ^ 
-    |       |        GROUP 3       |       | 
-    |  (*)  |_   _   _   _   _   _ |  \^/  |
-    | _<">_ | `_' `-' `_' `-' `_' `| _(#)_ |
-    o+o \ / \\0                      0/ \ / (=)
-    0'\ ^ /\/   *** Brian B ***    \/\ ^ /`0
-    /_^_\ |    ** Brian R **     | /_^_\\
-    || || |  **** Franco L ****  | || ||
-    d|_|b_T______________________T_d|_|b
-    '''
-    print_centered(ascii_art, width)
-    print()
+    about_us()
     print_centered("==PRESS ENTER TO RETURN TO MAIN MENU==", width)
     input()
     main_menu()
@@ -174,7 +166,7 @@ def character_menu():
     print()
 
     print_centered("Please Enter 1, 2, 3, 4, or 5", width)
-    response = get_user_input(["1", "2", "3", "4", "5"])
+    response = get_user_input(["1", "2", "3", "4", "5"], width)
 
     if response == "1":
         select_character(True)
@@ -209,7 +201,7 @@ def select_character(first_user):
     print_centered("Type in Character Name", width)
 
     character_list = [character.name for character in current_user.characters]
-    response = get_user_input(character_list)
+    response = get_user_input(character_list, width)
 
     character = user_session.query(Character).filter(Character.name== response).first()
     global user_character
@@ -224,7 +216,7 @@ def create_character():
     os.system("clear")
 
     print_centered("Enter Your New Character Name", width)
-    new_character_name= get_user_input(True)
+    new_character_name= get_user_input(True, width)
 
 #--Armor
     print_centered("Please Type in the Name of the Armor You Want to Select", width)
@@ -236,7 +228,7 @@ def create_character():
         print_centered(armor_string, width)
 
     print()
-    selected_armor_name = get_user_input((armor.name for armor in user_session.query(Armor)))
+    selected_armor_name = get_user_input((armor.name for armor in user_session.query(Armor)), width)
 
     selected_armor = user_session.query(Armor).filter(Armor.name == selected_armor_name).first()
     print_centered(f"You have selected {selected_armor}.", width)
@@ -245,14 +237,14 @@ def create_character():
 #--Weapon
     print_centered("Please Type in the Name of the Weapon You Want to Select", width)
     print()
-
+    weapons_vault()
     weapon_selection = user_session.query(Weapon.name, Weapon.damage, Weapon.speed).all()
     weapon_strings = [f"{name}: Damage={damage}, Speed={speed}" for name, damage, speed in weapon_selection]
     for weapon_string in weapon_strings:
         print_centered(weapon_string, width)
 
     print()
-    selected_weapon_name = get_user_input([weapon.name for weapon in user_session.query(Weapon).all()])
+    selected_weapon_name = get_user_input((weapon.name for weapon in user_session.query(Weapon).all()), width)
 
     selected_weapon = user_session.query(Weapon).filter(Weapon.name == selected_weapon_name).first()
     print_centered(f"You have selected {selected_weapon}.", width)
@@ -268,7 +260,7 @@ def create_character():
         print_centered(specialty_string, width)
 
     print()
-    selected_specialty_name = get_user_input([specialty.name for specialty in user_session.query(Specialty).all()])
+    selected_specialty_name = get_user_input([specialty.name for specialty in user_session.query(Specialty).all()], width)
 
     selected_specialty = user_session.query(Specialty).filter(Specialty.name == selected_specialty_name).first()
     print_centered(f"You have selected {selected_specialty}.", width)
@@ -302,12 +294,12 @@ def update_character():
         print()
 
     print_centered("==Type in Character to Update==", width)
-    response = get_user_input(character_list)
+    response = get_user_input(character_list, width)
     
     update_character_name = user_session.query(Character).filter(Character.name== response).first()
     print_centered("Enter Characters New Name.", width)
 
-    response = get_user_input(True)
+    response = get_user_input(True, width)
     update_character_name.name = response
     user_session.commi()
     character_menu()
@@ -322,10 +314,10 @@ def delete_character():
     print()
     print_centered("Type in Character to DELETE", width)
 
-    response = get_user_input(character_list)
+    response = get_user_input(character_list, width)
     delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
     
-    response = get_user_input(character_list)
+    response = get_user_input(character_list, width)
     delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
     user_session.commit()
     character_menu()
@@ -355,7 +347,7 @@ def battle_menu():
     print()
     
     print_centered("Please Enter 1, 2 or 3", width)
-    response = get_user_input(['1', '2', '3'])
+    response = get_user_input(['1', '2', '3'], width)
 
     if response == '1':
         playver_v_player()
@@ -391,7 +383,7 @@ def player_v_cpu():
         print()
 
         print_centered("Please Enter 1, 2, 3 or 4", width)
-        response = get_user_input(['1', '2', '3', '4'])
+        response = get_user_input(['1', '2', '3', '4'], width)
 
         if response in ['1', '2', '3']:
             battle_mode(response)
