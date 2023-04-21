@@ -204,10 +204,10 @@ def select_character(first_user):
     else:
         current_user = user_account_two
 
-    character_list = [user.name for user in user_account.characters]
+    character_list = [user.name for user in current_user.characters]
     print_centered("CHARACTERS LIST", width)
     print()
-    for character in user_account.characters:
+    for character in current_user.characters:
         print(character)
         print()
     print()
