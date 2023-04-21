@@ -41,7 +41,9 @@ def print_box(text, width, terminal_width):
     print(" " * padding + "+" + "-" * (width - 2) + "+")
 
 width = os.get_terminal_size().columns
-r_align = "".rjust(width - 11)
+half = int((width -25)/2)
+r_align = "".rjust(half)
+a_align = "".rjust(int((width-45)/2))
 
 ########################################
 #Login Section
@@ -51,12 +53,12 @@ def start_menu(session):
     global user_session
     user_session = session
     
-    print_box("Welcome to Character Builder ", 34, width)
+    print_box("Welcome to BOT DECIMATION ", 34, width)
     print()
     print_centered("--- Select an Option ---", width)
-    print_centered("1. Create New Account", width)
-    print_centered("2. Login to Account", width)
-    print_centered("Please Enter 1, 2, or q", width)
+    print(r_align, "1. Create New Account")
+    print(r_align, "2. Login to Account")
+    print(r_align, "Please Enter 1, 2, or q")
     
     response = get_user_input(["1", "2", "q"], width)
 
@@ -111,14 +113,13 @@ def create_account():
 #############################################
 def main_menu():
     os.system("clear")
-    print_centered(str(user_account), width)
 
     print_box("==== Main Menu ==== \n", 34, width)
     print()
-    print_centered("1. Character Selection", width)
-    print_centered("2. Battle", width)
-    print_centered("3. About", width)
-    print_centered("4. Log Out", width)
+    print(r_align, "1. Character Selection")
+    print(r_align, "2. Battle")
+    print(r_align, "3. About")
+    print(r_align, "4. Log Out")
     print()
 
     print_centered("Please Enter 1, 2, 3 or 4", width)
@@ -142,7 +143,14 @@ def log_out():
 
 def about():
     os.system("clear")
-    about_us()
+
+    with open('about.txt') as f:
+        data = f.readlines()
+
+    for line in data:
+        words = line
+        print(a_align, words)
+
     print_centered("==PRESS ENTER TO RETURN TO MAIN MENU==", width)
     input()
     main_menu()
@@ -165,11 +173,11 @@ def character_menu():
     print_centered(f"Current Character: {current_character}", width)
     print()
     print_centered("--- Select an Option ---", width)
-    print_centered("1. Select Character", width)
-    print_centered("2. Create Character", width)
-    print_centered("3. Update Character", width)
-    print_centered("4. Delete Character", width)
-    print_centered("5. Return to Main Menu", width)
+    print(r_align,"1. Select Character")
+    print(r_align,"2. Create Character")
+    print(r_align,"3. Update Character")
+    print(r_align,"4. Delete Character")
+    print(r_align,"5. Return to Main Menu")
     print()
 
     print_centered("Please Enter 1, 2, 3, 4, or 5", width)
@@ -199,7 +207,9 @@ def select_character(first_user):
     character_list = [user.name for user in user_account.characters]
     print_centered("CHARACTERS LIST", width)
     print()
-    print_centered('  '.join(character_list), width)
+    for character in user_account.characters:
+        print(character)
+        print()
     print()
     
     print_centered("Type in Character Name", width)
@@ -383,10 +393,10 @@ def battle_menu():
     print_centered(f"Current Character: {current_character}", width)
     print()
     print_centered("--- Select an Option ---", width)
-    print_centered("1. Battle a Friend", width)
-    print_centered("2. Battle Enemy", width)
-    print_centered("3. The Arena", width)
-    print_centered("4. Return to Main Menu", width)
+    print(r_align,"1. Battle a Friend")
+    print(r_align,"2. Battle Enemy")
+    print(r_align,"3. The Arena")
+    print(r_align,"4. Return to Main Menu")
     print()
     
     print_centered("Please Enter 1, 2, 3 or 4", width)
@@ -428,10 +438,10 @@ def player_v_cpu():
         print_centered(f"Current Character: {user_character.name}", width)
         print()
         print_centered("--- Select an Option ---", width)
-        print_centered("1. Easy", width)
-        print_centered("2. Medium", width)
-        print_centered("3. Hard", width)
-        print_centered("4. Return to Battle Menu", width)
+        print(r_align, "1. Easy")
+        print(r_align, "2. Medium")
+        print(r_align, "3. Hard")
+        print(r_align, "4. Return to Battle Menu")
         print()
 
         print_centered("Please Enter 1, 2, 3 or 4", width)
