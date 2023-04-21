@@ -1,4 +1,7 @@
 import os
+import colorama
+import pyfiglet
+import math
 import time
 import random
 from db.models import (Base, Armor, Weapon, Specialty, Character, User)
@@ -38,6 +41,7 @@ def print_box(text, width, terminal_width):
     print(" " * padding + "+" + "-" * (width - 2) + "+")
 
 width = os.get_terminal_size().columns
+r_align = "".rjust(width - 11)
 
 ########################################
 #Login Section
@@ -113,7 +117,7 @@ def main_menu():
     print_centered("1. Character Selection", width)
     print_centered("2. Battle", width)
     print_centered("3. About", width)
-    print_centered("4. amyLog Out", width)
+    print_centered("4. Log Out", width)
     print()
 
     print_centered("Please Enter 1, 2, 3 or 4", width)
@@ -194,11 +198,8 @@ def select_character(first_user):
     character_list = [user.name for user in user_account.characters]
     print_centered("CHARACTERS LIST", width)
     print()
-    print_centered(''.join(character_list), width)
+    print_centered('  '.join(character_list), width)
     print()
-    print_centered("Type in Character to DELETE", width)
-    print()
-
     
     print_centered("Type in Character Name", width)
 
@@ -221,6 +222,7 @@ def create_character():
     new_character_name= get_user_input(True, width)
 
 #--Armor
+    os.system('clear')
     print_centered("Please Type in the Name of the Armor You Want to Select", width)
     print()
 
@@ -237,13 +239,20 @@ def create_character():
     print()
 
 #--Weapon
+    os.system('clear')
+    weapon_functions = [chainsaw, chain_ball_whip, poison_gas, taser_gun]
+    i = 0
     print_centered("Please Type in the Name of the Weapon You Want to Select", width)
     print()
-    weapons_vault()
+    # weapons_vault()
+    print_centered("===============WEAPONS VAULT==================", width)
     weapon_selection = user_session.query(Weapon.name, Weapon.damage, Weapon.speed).all()
     weapon_strings = [f"{name}: Damage={damage}, Speed={speed}" for name, damage, speed in weapon_selection]
+
     for weapon_string in weapon_strings:
+        weapon_functions[i]()
         print_centered(weapon_string, width)
+        i += 1
 
     print()
     selected_weapon_name = get_user_input((weapon.name for weapon in user_session.query(Weapon).all()), width)
@@ -253,6 +262,7 @@ def create_character():
     print()
 
 #--Specialty
+    os.system('clear')
     print_centered("Please Type in the Name of the Specialty You Want to Select", width)
     print()
 
@@ -273,7 +283,7 @@ def create_character():
 
     user_session.add(user_character)
     user_session.commit()
-
+    os.system('clear')
     print_centered("New Character Created!", width)
     print()
     print_centered(f"Name: {new_character_name}", width)
@@ -303,7 +313,7 @@ def update_character():
 
     response = get_user_input(True, width)
     update_character_name.name = response
-    user_session.commi()
+    user_session.commit()
     character_menu()
 
 def delete_character():
@@ -345,17 +355,20 @@ def battle_menu():
     print_centered("--- Select an Option ---", width)
     print_centered("1. Battle a Friend", width)
     print_centered("2. Battle Enemy", width)
-    print_centered("3. Return to Main Menu", width)
+    print_centered("3. The Arena", width)
+    print_centered("4. Return to Main Menu", width)
     print()
     
-    print_centered("Please Enter 1, 2 or 3", width)
-    response = get_user_input(['1', '2', '3'], width)
+    print_centered("Please Enter 1, 2, 3 or 4", width)
+    response = get_user_input(['1', '2', '3', '4'], width)
 
     if response == '1':
         playver_v_player()
     elif response == '2':
         player_v_cpu()
     elif response == '3':
+        the_arena()
+    elif response == '4':
         main_menu()
 
 def playver_v_player():
@@ -426,11 +439,14 @@ def battle_mode(mode):
         the_enemy = enemy_generator(mode)
 
     player = {
+        'name': user_character.name,
         "defense": (user_character.defense + user_character.armor.defense + user_character.specialty.defense),
         "damage": (user_character.damage + user_character.weapon.damage + user_character.specialty.damage),
         "speed": (user_character.speed + user_character.armor.speed + user_character.weapon.speed),
         'health': user_character.health
     }
+
+    battle_ascii(player['name'], the_enemy['name'])
 
     while player["health"] > 0 and the_enemy["health"] > 0:
 
@@ -439,15 +455,18 @@ def battle_mode(mode):
             the_enemy["health"] = the_enemy["health"] - turn_damage*(1-(the_enemy["defense"]/100))
             players_turn = False
 
+            health_bar(player, the_enemy)        
+            # attack_msg(player_cpu, player_one, turn_damage)
             print_centered(f"The {user_character.name}'s Turn ====", width)
             print_centered(f"{user_character.name} Deals {turn_damage} Dmg", width)
             print_centered(f"{the_enemy['name']}'s Heath is {the_enemy['health']}", width)
             print()
             time.sleep(3)
+            os.system('clear')
         else:
             turn_damage = random.randint((the_enemy["damage"]-5), the_enemy["damage"])   *(the_enemy["speed"]/10)
             player["health"] = player["health"] - turn_damage*(1-(player["defense"]/100))
-
+            health_bar(player, the_enemy)   
             print_centered(f"==== {the_enemy['name']}'s Turn ====", width)
             print_centered(f"{the_enemy['name']} Deals {turn_damage} Dmg", width)
             print_centered(f"{user_character.name}'s Heath is {player['health']}", width)
@@ -455,6 +474,7 @@ def battle_mode(mode):
 
             players_turn = True
             time.sleep(3)
+            os.system("clear")
 
 
     if player['health'] <= 0:
@@ -504,7 +524,17 @@ def enemy_generator(mode):
         "defense": defense,
         "speed": speed,
         "damage": damage,
-        'health': health
+        'health': health,
+        'position':[random.randint(0,9), random.randint(30,48) ],
+        'movement': 10,
+        'range': 1,
+        'weapon': "normal",
+        'attacks': "active",
+        'crit_strike': 1,
+        'status': ['normal', 0],
+        'alternate': True, 
+        'mode': None,
+        'turn': False
     }
 
     return enemy
@@ -512,3 +542,321 @@ def enemy_generator(mode):
 
 #THE GAME
 # Implement this part last
+
+#########################################################################################################################################
+#########################################################################################################################################
+#THE GAME
+####################  This Function Starts ARENA ##########################
+def the_arena():
+    # represents key pressed by client
+
+    if user_character:
+        player_two = enemy_generator('3')
+
+        player_one = {
+            'name': user_character.name,
+            "defense": (user_character.defense + user_character.armor.defense + user_character.specialty.defense),
+            "damage": (user_character.damage + user_character.weapon.damage + user_character.specialty.damage),
+            "speed": (user_character.speed + user_character.armor.speed + user_character.weapon.speed),
+            'health': user_character.health,
+            'position': [8, 19],
+            'movement': 10,
+            'range': 1,
+            'weapon': user_character.weapon.name,
+            'attacks': "active",
+            'crit_strike': 1,
+            'status': ['normal', 0],
+            'mode': 'move',
+            'turn': False
+        }
+
+        if(player_one['speed'] >= player_two['speed']):
+            player_one['turn'] = True
+        else:
+            player_two['turn'] = True
+
+        # This is the infinite while loop
+        # Reacts based on the User's input. Until the User enters 'q'
+        battle_ascii(player_one['name'], player_two['name'])
+        while player_one['health'] > 0 and player_two['health'] > 0:
+
+            os.system('clear')
+
+            if player_one['turn']:
+                players_turn(player_one, player_two)
+            elif player_two['turn']:
+                cpu_turn(player_two, player_one)
+    else:
+        os.system("clear")
+        print("\n \n \n")
+        print_centered("== YOU MUST SELECT A CHARACTER FIRST ==", width)
+        print()
+        print_centered("Moving to Character Menu ...", width)
+        time.sleep(3)
+        character_menu()
+    if player_one['health'] <= 0:
+        if player_two['health'] >= 35:
+            print_centered(f"{player_two['name']} HAS CRUSHED {user_character.name} TO THE GROUND", width)
+        elif player_two['health'] >= 15:
+            print_centered(f"{player_two['name']} Managaed To Defeat {user_character.name}", width)
+        else:
+            print_centered(f"{player_two['name']} Barely Endured The Battle Against {user_character.name}", width)
+    else:
+        if player_one['health'] >= 35:
+            print_centered(f"{user_character.name} HAS CRUSHED {player_two['name']} TO THE GROUND", width)
+        elif player_one['health'] >= 15:
+            print_centered(f"{user_character.name} Managaed To Defeat {player_two['name']}", width)
+        else:
+            print_centered(f"{user_character.name} Barely Endured The Battle Against {player_two['name']}", width)
+            print()
+    print_centered("PRESS ENTER TO RETURN TO MENU", width)
+    input()
+    
+    battle_menu()
+
+
+
+
+
+#### Calculates Dmg deducts it from Defenders Health returns Dmg #########################################
+def attack_dmg(attacker, defender):
+    poisoned_dmg = 0
+    # Crit_strike is set to 2 if Crit is successful
+    if random.randint(1,4) == 4:
+        attacker['crit_strike'] = 2
+
+    if attacker['weapon'] == 'poison gas':
+        defender['status'] = ['poisoned', 2]
+    elif attacker['weapon'] == 'stun gun':
+        if random.randint(1,2) == 2:
+            defender['status'] = ["stunned", 1]
+
+    turn_damage = math.floor( 
+        #Attack Dmg is first increased or decreased  by Attackers Speed Coefecient
+        (random.randint((attacker["damage"]-5), attacker["damage"])*(attacker["speed"]/10))
+        #Attack Dmg is then doubled if Attacker got a Crit
+        * attacker['crit_strike'] 
+        #Total DMg is then reduced by Defenders Defense coefecient
+        * (1 - (defender["defense"]/100)) 
+        ) 
+    
+    if defender['status'][0] == 'poisoned':
+        poisoned_dmg = 5
+        defender['status'][1] -= 1
+        if defender['status'][1] == 0:
+            defender['status'][1] = 'normal'
+    
+    defender["health"] = defender["health"] - turn_damage - poisoned_dmg
+    return [turn_damage, poisoned_dmg]
+
+
+########################### PRINTS OFF DAMAGE MESSAGE ##########################################
+def attack_msg(attacker, defender, turn_damage): 
+    if attacker['crit_strike'] == 2:
+        ascii_art = pyfiglet.figlet_format("!!!!! CRIT !!!!!")
+        print(ascii_art)
+        attacker['crit_strike'] = 1
+
+    print(           
+    f"==== The {attacker['name']}'s Turn ==== \n" 
+    + f"{attacker['name']} Deals {turn_damage[0]} Dmg \n")
+    if(turn_damage[1] > 0):
+        print(f"!!! {defender['name']} IS POISONED !!! \n")
+        print(f"{defender['name']} suffers {turn_damage[1]} Poison Dmg.\n")
+    print(f"{defender['name']}'s Heath is {defender['health']} \n \n"
+    )
+    # time.sleep(3)
+
+############################# PRINTS HEALTH BAR ####################################################
+def health_bar(player_one, player_two):
+    os.system('clear')
+    print("".rjust(20),f"======== {player_one['name']}: {player_one['health']} ========================== {player_two['name']}: {player_two['health']} ======== \n\n\n\n")
+  
+############################# PRINTS  Starting Battle Message ####################################################
+def battle_ascii(player_one, player_two):
+    text = f"{player_one}\nVS\n{player_two}"
+
+    for i in range(0,6):
+        ascii_art = pyfiglet.figlet_format(text)
+        print(ascii_art)
+
+        time.sleep(0.2)
+        os.system("clear")
+
+        ascii_art = pyfiglet.figlet_format(text, font="slant")
+        print(ascii_art)
+
+        time.sleep(0.2)
+        os.system("clear")
+
+    ascii_art = pyfiglet.figlet_format("! BEGIN FIGHT !")
+    print(ascii_art)
+
+    time.sleep(1)
+    os.system("clear")
+
+####################  This Function Hands Over Control To Player ##########################
+def players_turn(player_one, player_two):
+    key = ''
+    turn_damage = [0,0]
+    player_one['movement'] = player_one['speed']
+    player_one['attacks'] = 'active'
+
+    while player_one['turn']:    
+        if(key == "move"):
+            player_one['mode'] = 'move'            
+        elif(key =="attack"):
+            player_one['mode'] = 'attack'
+        elif(key == 'end'):
+            player_one['turn'] = False
+            player_two['turn'] = True
+            return 
+        
+        
+        if(player_one['mode'] == 'move' and player_one['movement'] > 0):
+                calc_movement(key, player_one, player_two)
+
+        elif((player_one['mode'] == 'attack') and (player_one['attacks'] == 'active')):
+            if(calc_in_range(player_one, player_two)):
+                turn_damage = attack_dmg(player_one, player_two)
+                player_one['attacks'] = None
+            else:
+                pass
+                # print("The Enemy Is Not In Range")
+
+        os.system('clear')
+        
+        health_bar(player_one, player_two)        
+        print_grid(player_one, player_two)
+        attack_msg(player_one, player_two, turn_damage)
+        print(f"==== Movement: {player_one['movement']} == Attacks: {player_one['attacks']}")
+        print("---Select an Option ---")
+        print("Enter a key:  ")
+        key = input()
+
+#########################  This Function Hands Over Control to The Computer #########################################
+def cpu_turn(player_cpu, player_one):
+    player_cpu['attacks'] =  'active'
+    player_cpu['movement'] = player_cpu['speed']
+    player_cpu['turn'] = True
+    turn_damage = [0, 0]
+
+    while player_cpu['turn']:
+        if(player_cpu['movement'] > 0):
+            cpu_movement(player_cpu, player_one)
+        else:
+            player_cpu['turn'] = False
+            player_one['turn'] = True
+        
+        if(player_cpu['attacks'] == None):
+            attack_dmg(player_cpu, player_one)
+            player_cpu['turn'] = False
+            player_one['turn'] = True
+        os.system('clear')
+        health_bar(player_one, player_cpu)        
+        print_grid(player_one, player_cpu)
+        attack_msg(player_cpu, player_one, turn_damage)
+        time.sleep(1)
+
+
+def calc_in_range(player_one, player_two):
+    in_range = (player_one['position'][0] == player_two['position'][0] and 0 < abs(player_one['position'][1] - player_two["position"][1]) <= player_one['range']) \
+            or (player_one['position'][1] == player_two['position'][1] and 0 < abs(player_one['position'][0] - player_two["position"][0]) <= player_one['range'])
+    return in_range
+    
+
+# This function is used to calculate the player_one's new position and to reduce its movement by 1
+# I didn't write any kind of if statements to prevent a player_one from moving once their
+# move hits zero. So 'move' attribute is worthless now. but changing 'position' is important #######################################
+def calc_movement(key, player, other_player):
+    if key == "w" \
+        and not(player['position'][0] -1 == other_player['position'][0] and player['position'][1] == other_player['position'][1] ):
+        player['position'][0] -= 1
+        player['movement'] -= 1
+
+    if key == "s" \
+        and not(player['position'][0] +1 == other_player['position'][0] and player['position'][1] == other_player['position'][1] ):
+        player['position'][0] += 1
+        player['movement'] -= 1
+
+    if key == 'd' \
+        and not(player['position'][1] +1 == other_player['position'][1] and player['position'][0] == other_player['position'][0] ):
+        player['position'][1] += 1
+        player['movement'] -= 1
+    if key == 'a' \
+        and not(player['position'][1] -1 == other_player['position'][1] and player['position'][0] == other_player['position'][0] ):
+        player['movement'] -= 1
+        player['position'][1] -= 1
+
+
+
+#########################  Algorithm to Move CPU player Towards Player One #####################################################################
+def cpu_movement(player_cpu, player_one):
+    
+    x, y = player_one['position'][0]-player_cpu['position'][0], player_one['position'][1]-player_cpu['position'][1]
+
+    # print(x)
+    if (y == 0 and abs(x) == 1) or (x == 0 and abs(y) == 1):
+        player_cpu['attacks'] = None
+        player_cpu['movement'] = 0
+        return True
+    elif( y == 0):
+        player_cpu['alternate'] = True
+    elif(x == 0):
+        player_cpu['alternate'] = False
+
+    # print(player_cpu['position'])
+    if player_cpu['alternate'] or y == 0:
+        player_cpu['alternate'] = False
+        if x < 0:
+            player_cpu['position'][0] -= 1
+            player_cpu['movement'] -= 1
+            return
+        elif x > 0:
+            player_cpu['position'][0] += 1
+            player_cpu['movement'] -= 1
+            return
+    elif not player_cpu['alternate'] or x == 0: 
+        player_cpu['alternate'] = True  
+        if y < 0:
+            player_cpu['position'][1] -= 1
+            player_cpu['movement'] -= 1
+            return
+        elif y > 0:
+            player_cpu['position'][1] += 1
+            player_cpu['movement'] -= 1
+            return
+
+
+
+#########################  PRINTS OUT THE GRID. MAY WANT TO TURN THIS INTO A LIST #########################################
+def print_grid(player_one, player_two):
+#These are two loops. The first one represents the rows in the grid
+#All it does is print a new line. The 2nd prints each space in in the row or column
+    for row in range(11):
+        for column in range(51):
+
+# 'position' is a dict key value in User with a value pair that a list with 2 indexes.
+# The [0] index represents the row position of player_one and the [1] the column
+# The first if statement checks if row $ column match with player_one and enemies [0] & [1] index
+# If they do they print an X to represent the player_one or enemy 
+            if((row == player_one['position'][0] and column == player_one['position'][1]) or
+            (row == player_two['position'][0] and column == player_two['position'][1]) ):  
+                print("X", end='')
+
+# This is a dumb feature I included. which is suppose to visually represent how much movement
+# The player_one has. User[mode] reprsents if player_one is in attack mode or movement mode. Entering 'm' puts
+# you in movement mode. 'a' in attack mode (I didn't think about how I was using aswd to represent
+# movement and so choosing 'a' for both moving right and attack mode was dumb). Anyways if you
+# 3 movement then it prints out a ^ symbol for any square thats 3 places away from you. so you
+# how far you can actually movement
+            elif((player_one['mode'] == 'm') and 
+                ((abs(row - player_one['position'][0]) + abs(column - player_one['position'][1])) <= player_one['movement'])):
+                print("^", end='')
+
+# This just prints out a generic  '.' to represent an empty space  
+            else:
+                print(".", end='')
+
+# This prints out the new line so when the first for loop repeats it will create a new row
+        print("")
