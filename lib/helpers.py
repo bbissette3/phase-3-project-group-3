@@ -473,7 +473,17 @@ def battle_mode(mode):
         "defense": (user_character_two.defense + user_character_two.armor.defense + user_character_two.specialty.defense),
         "damage": (user_character_two.damage + user_character_two.weapon.damage + user_character_two.specialty.damage),
         "speed": (user_character_two.speed + user_character_two.armor.speed + user_character_two.weapon.speed),
-        'health': user_character_two.health
+        'health': 100,
+        'position': [8, 19],
+        'movement': 10,
+        'range': 1,
+        'weapon': user_character.weapon.name,
+        'attacks': "active",
+        'crit_strike': 1,
+        'status': ['normal', 0],
+        'mode': 'move',
+        'turn': False,
+        'hurt': False
         }
 
     else:
@@ -484,7 +494,17 @@ def battle_mode(mode):
         "defense": (user_character.defense + user_character.armor.defense + user_character.specialty.defense),
         "damage": (user_character.damage + user_character.weapon.damage + user_character.specialty.damage),
         "speed": (user_character.speed + user_character.armor.speed + user_character.weapon.speed),
-        'health': user_character.health
+        'health': 100,
+        'position': [8, 19],
+        'movement': 10,
+        'range': 1,
+        'weapon': user_character.weapon.name,
+        'attacks': "active",
+        'crit_strike': 1,
+        'status': ['normal', 0],
+        'mode': 'move',
+        'turn': False,
+        'hurt': False
     }
 
     battle_ascii(player['name'], the_enemy['name'])
@@ -542,7 +562,7 @@ def enemy_generator(mode):
     defense = None
     speed = None
     damage = None
-    health = 50 
+    health = 100 
 
     enemy_names = ["!Student", "A.I.", "Eviler Kribby", "DJ B0T", "Antonio B0T", "The Dominator"]
 
@@ -575,7 +595,8 @@ def enemy_generator(mode):
         'status': ['normal', 0],
         'alternate': True, 
         'mode': None,
-        'turn': False
+        'turn': False,
+        'hurt': False
     }
 
     return enemy
@@ -592,14 +613,14 @@ def the_arena():
     # represents key pressed by client
 
     if user_character:
-        player_two = enemy_generator('2')
+        player_two = enemy_generator('3')
 
         player_one = {
             'name': user_character.name,
             "defense": (user_character.defense + user_character.armor.defense + user_character.specialty.defense),
             "damage": (user_character.damage + user_character.weapon.damage + user_character.specialty.damage),
             "speed": (user_character.speed + user_character.armor.speed + user_character.weapon.speed),
-            'health': user_character.health,
+            'health': 100,
             'position': [8, 19],
             'movement': 10,
             'range': 1,
@@ -608,7 +629,8 @@ def the_arena():
             'crit_strike': 1,
             'status': ['normal', 0],
             'mode': 'move',
-            'turn': False
+            'turn': False,
+            'hurt': False
         }
 
         if(player_one['speed'] >= player_two['speed']):
@@ -666,9 +688,9 @@ def attack_dmg(attacker, defender):
     if random.randint(1,4) == 4:
         attacker['crit_strike'] = 2
 
-    if attacker['weapon'] == 'poison gas':
+    if attacker['weapon'] == 'Poison Gas':
         defender['status'] = ['poisoned', 2]
-    elif attacker['weapon'] == 'stun gun':
+    elif attacker['weapon'] == 'Taser Gun':
         if random.randint(1,2) == 2:
             defender['status'] = ["stunned", 1]
 
@@ -681,11 +703,11 @@ def attack_dmg(attacker, defender):
         * (1 - (defender["defense"]/100)) 
         ) 
     
-    if defender['status'][0] == 'poisoned':
-        poisoned_dmg = 5
-        defender['status'][1] -= 1
-        if defender['status'][1] == 0:
-            defender['status'][1] = 'normal'
+    # if defender['status'][0] == 'poisoned':
+    #     poisoned_dmg = 5
+    #     defender['status'][1] -= 1
+    #     if defender['status'][1] == 0:
+    #         defender['status'][1] = 'normal'
     
     defender["health"] = defender["health"] - turn_damage - poisoned_dmg
     return [turn_damage, poisoned_dmg]
@@ -704,14 +726,39 @@ def attack_msg(attacker, defender, turn_damage):
     if(turn_damage[1] > 0):
         print(f"!!! {defender['name']} IS POISONED !!! \n")
         print(f"{defender['name']} suffers {turn_damage[1]} Poison Dmg.\n")
-    print(f"{defender['name']}'s Health is {defender['health']} \n \n"
+    print(f"{defender['name']}'s Heath is {defender['health']} \n \n"
     )
     # time.sleep(3)
 
 ############################# PRINTS HEALTH BAR ####################################################
 def health_bar(player_one, player_two):
     # os.system('clear')
-    print("".rjust(20),f"======== {player_one['name']}: {player_one['health']} ========================== {player_two['name']}: {player_two['health']} ======== \n\n\n\n")
+    # os.system('clear')
+    # print(f"========"+ colorama.Fore.LIGHTYELLOW_EX +f" {player_one['name']}"+ colorama.Style.RESET_ALL +f": {player_one['health']} ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL +f": {player_two['health']} ======== \n\n\n\n")
+    # print_grid(player_one, player_two)
+    # time.sleep(.1)
+
+    # os.system('clear')
+    if(player_one['turn'] and player_one['hurt']):
+        # print(f"======== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_one['name']}"+ colorama.Style.RESET_ALL +f": "+ colorama.Fore.LIGHTRED_EX+ f"{player_one['health']}" + colorama.Style.RESET_ALL + f" ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL+f": {player_two['health']} ======== \n\n\n\n")
+        print_centered(f"======== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_one['name']}"+ colorama.Style.RESET_ALL +f": "+ colorama.Fore.LIGHTRED_EX+ f"{player_one['health']}" + colorama.Style.RESET_ALL + f" ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL+f": {player_two['health']} ======== \n\n\n\n", width)
+        print_grid(player_one, player_two)
+        time.sleep(.4)
+        player_one['hurt'] = False
+        os.system('clear')
+    if(player_one['turn'] and player_two['hurt']):
+        print_centered(f"======== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_one['name']}"+ colorama.Style.RESET_ALL +f": "+ f"{player_one['health']}" + colorama.Style.RESET_ALL + f" ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL+f":"+ colorama.Fore.LIGHTRED_EX+ f" {player_two['health']}"+ colorama.Style.RESET_ALL + f" ======== \n\n\n\n", width)
+
+        # print(f"======== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_one['name']}"+ colorama.Style.RESET_ALL +f": "+ f"{player_one['health']}" + colorama.Style.RESET_ALL + f" ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL+f":"+ colorama.Fore.LIGHTRED_EX+ f" {player_two['health']}"+ colorama.Style.RESET_ALL + f" ======== \n\n\n\n")
+        print_grid(player_one, player_two)
+        time.sleep(.4)
+        player_two['hurt'] = False
+        os.system('clear')
+    # print(f"========"+ colorama.Fore.LIGHTYELLOW_EX +f" {player_one['name']}"+ colorama.Style.RESET_ALL +f": {player_one['health']} ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL +f": {player_two['health']} ======== \n\n\n\n")
+    print_centered(f"========"+ colorama.Fore.LIGHTYELLOW_EX +f" {player_one['name']}"+ colorama.Style.RESET_ALL +f": {player_one['health']} ========================== "+ colorama.Fore.LIGHTYELLOW_EX +f"{player_two['name']}"+ colorama.Style.RESET_ALL +f": {player_two['health']} ======== \n\n\n\n", width)
+
+    
+    # print("".rjust(20),f"======== {player_one['name']}: {player_one['health']} ========================== {player_two['name']}: {player_two['health']} ======== \n\n\n\n")
 
 ############################# PRINTS  Starting Battle Message ####################################################
 def battle_ascii(player_one, player_two):
@@ -750,6 +797,7 @@ def players_turn(player_one, player_two):
             player_one['mode'] = 'attack'
         elif(key == 'end'):
             player_one['turn'] = False
+            player_one['move'] = 'move'
             player_two['turn'] = True
             return 
         
@@ -760,22 +808,17 @@ def players_turn(player_one, player_two):
         elif((player_one['mode'] == 'attack') and (player_one['attacks'] == 'active')):
             if(calc_in_range(player_one, player_two)):
                 turn_damage = attack_dmg(player_one, player_two)
+                player_two['hurt'] = True
                 player_one['attacks'] = None
             else:
                 pass
                 # print("The Enemy Is Not In Range")
 
         os.system('clear')
+
         
         health_bar(player_one, player_two)        
         print_grid(player_one, player_two)
-
-        print("Use W, A, S, D and press Enter to Move")
-        print("When next to Enemy Type Attack to Attack Enemy")
-        print("You must type and press Enter to end your turn")
-        print()
-        print("You are the 🦸‍♂️")
-
         attack_msg(player_one, player_two, turn_damage)
         print(f"==== Movement: {player_one['movement']} == Attacks: {player_one['attacks']}")
         print("---Select an Option ---")
@@ -788,23 +831,46 @@ def cpu_turn(player_cpu, player_one):
     player_cpu['movement'] = player_cpu['speed']
     player_cpu['turn'] = True
     turn_damage = [0, 0]
+    start = True
 
     while player_cpu['turn']:
         if(player_cpu['movement'] > 0):
             cpu_movement(player_cpu, player_one)
         else:
-            player_cpu['turn'] = False
+            player_cpu['turn'] = False  
             player_one['turn'] = True
         
         if(player_cpu['attacks'] == None):
             attack_dmg(player_cpu, player_one)
+            player_one['hurt'] = True
             player_cpu['turn'] = False
             player_one['turn'] = True
         os.system('clear')
         health_bar(player_one, player_cpu)        
         print_grid(player_one, player_cpu)
+        if start:
+            start = False
+            if player_cpu['status'][0] == 'stunned':
+                print(f"{player_cpu['name']} Has Been Stunned")
+                print(colorama.Fore.YELLOW + f"{player_cpu['name']} Loses It's Turn" + colorama.Style.RESET_ALL)
+                player_cpu['turn'] = False
+                player_one['turn'] = True
+                player_cpu['status'][0] = 'normal'
+                time.sleep(3)
+                return
+            if player_cpu['status'][0] == 'poisoned':
+                poisoned_dmg = 5
+                player_cpu['health'] -= 5
+                player_cpu['status'][1] = player_cpu['status'][1] - 1
+                print(colorama.Fore.RED + f"{player_cpu['name']} has suffered 5 Poison damage" + colorama.Style.RESET_ALL)
+              
+                time.sleep(2)
+
+                if player_cpu['status'][1] == 0:
+                    player_cpu['status'][0] = 'normal'
+        
         attack_msg(player_cpu, player_one, turn_damage)
-        time.sleep(1)
+        time.sleep(.5)
 
 
 def calc_in_range(player_one, player_two):
