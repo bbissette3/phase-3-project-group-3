@@ -80,8 +80,7 @@ def log_in(first_user):
 
     user_names = [user.username.title() for user in user_session.query(User).all()]
     response = get_user_input(user_names, width)
-  
-   
+
     global user_account
     user = user_session.query(User).filter(User.username == response).first()
 
@@ -297,42 +296,72 @@ def create_character():
 def update_character():
     os.system("clear")
 
-    character_list =[user.name for user in user_account.characters]
-    print_centered("Character List:", width)
+    print_box("==== Update Character Menu ====", 34, width)
+    print()
+    print_centered("--- Select an Option ---", width)
+    print_centered("1. Update Character", width)
+    print_centered("2. Go Back", width)
+    print()
 
-    for character in character_list:
-        print()
-        print_centered(character, width)
-        print()
+    print_centered("Please Enter 1, or 2", width)
+    response = get_user_input(['1', '2'], width)
 
-    print_centered("==Type in Character to Update==", width)
-    response = get_user_input(character_list, width)
-    
-    update_character_name = user_session.query(Character).filter(Character.name== response).first()
-    print_centered("Enter Characters New Name.", width)
+    if response == '1':
 
-    response = get_user_input(True, width)
-    update_character_name.name = response
-    user_session.commit()
-    character_menu()
+        character_list =[user.name for user in user_account.characters]
+        print_centered("Character List:", width)
+
+        for character in character_list:
+            print()
+            print_centered(character, width)
+            print()
+
+        print_centered("==Type in Character to Update==", width)
+        response = get_user_input(character_list, width)
+        
+        update_character_name = user_session.query(Character).filter(Character.name== response).first()
+        print_centered("Enter Characters New Name.", width)
+
+        response = get_user_input(True, width)
+        update_character_name.name = response
+        user_session.commit()
+        character_menu()
+
+    elif response == '2':
+        character_menu()
 
 def delete_character():
     os.system("clear")
 
-    character_list = [user.name for user in user_account.characters]
-    print_centered("CHARACTERS LIST", width)
+    print_box("==== Delete Character Menu ====", 34, width)
     print()
-    print_centered(''.join(character_list), width)
+    print_centered("--- Select an Option ---", width)
+    print_centered("1. Delete Character", width)
+    print_centered("2. Go Back", width)
     print()
-    print_centered("Type in Character to DELETE", width)
 
-    response = get_user_input(character_list, width)
-    delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
-    
-    response = get_user_input(character_list, width)
-    delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
-    user_session.commit()
-    character_menu()
+    print_centered("Please Enter 1, or 2", width)
+    response = get_user_input(['1', '2'], width)
+
+    if response == '1':
+
+        character_list = [user.name for user in user_account.characters]
+        print_centered("CHARACTERS LIST", width)
+        print()
+        print_centered(''.join(character_list), width)
+        print()
+        print_centered("Type in Character to DELETE", width)
+
+        response = get_user_input(character_list, width)
+        delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
+        
+        response = get_user_input(character_list, width)
+        delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
+        user_session.commit()
+        character_menu()
+
+    elif response == '2':
+        character_menu()
 
 
 
@@ -671,7 +700,7 @@ def attack_msg(attacker, defender, turn_damage):
 def health_bar(player_one, player_two):
     os.system('clear')
     print("".rjust(20),f"======== {player_one['name']}: {player_one['health']} ========================== {player_two['name']}: {player_two['health']} ======== \n\n\n\n")
-  
+
 ############################# PRINTS  Starting Battle Message ####################################################
 def battle_ascii(player_one, player_two):
     text = f"{player_one}\nVS\n{player_two}"
