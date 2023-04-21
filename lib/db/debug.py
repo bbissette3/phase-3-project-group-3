@@ -41,13 +41,13 @@ if __name__ == "__main__":
     session.commit()
 
     liar = Specialty(name="Liar", defense=10, damage=3)
-    builder = Specialty(name="Builder", defense=8, damage=0)
-    swimmer = Specialty(name="Swimmer", defense=0, damage=3)
+    medic = Specialty(name="Medic", defense=8, damage=0)
+    cloaking = Specialty(name="Cloaking", defense=0, damage=7)
     gentleperson = Specialty(name="Gentle Person", defense=5, damage=5)
     
     session.add(liar)
-    session.add(builder)
-    session.add(swimmer)
+    session.add(medic)
+    session.add(cloaking)
     session.add(gentleperson)
     session.commit()
 

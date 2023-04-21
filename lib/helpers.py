@@ -74,8 +74,10 @@ def log_in(first_user):
 
     users = (user_session.query(User).all())
     user_strings = [f"{user.username}" for user in users]
+
     for user_string in user_strings:
         print_centered(user_string, width)
+
     print_centered("Please Enter Your Username", width)
 
     user_names = [user.username.title() for user in user_session.query(User).all()]
@@ -344,26 +346,25 @@ def delete_character():
     response = get_user_input(['1', '2'], width)
 
     if response == '1':
-
+        os.system('clear')
         character_list = [user.name for user in user_account.characters]
-        print_centered("CHARACTERS LIST", width)
-        print()
-        print_centered(''.join(character_list), width)
-        print()
-        print_centered("Type in Character to DELETE", width)
+        print_centered("CHARACTERS LIST:", width)
+
+        for character in character_list:
+            print()
+            print_centered(character, width)
+            print()
+
+        print_centered("Type in Character Name to DELETE", width)
 
         response = get_user_input(character_list, width)
         delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
         
-        response = get_user_input(character_list, width)
-        delete_character_obj = user_session.query(Character).filter(Character.name == response).delete()
         user_session.commit()
         character_menu()
 
     elif response == '2':
         character_menu()
-
-
 
 ############################################
 # Battle Section
@@ -404,6 +405,7 @@ def playver_v_player():
     os.system('clear')
     global user_account_two
     global user_character_two
+
     if user_character:
         user_account_two = log_in(False)
         user_character_two = select_character(False)
@@ -480,8 +482,8 @@ def battle_mode(mode):
     while player["health"] > 0 and the_enemy["health"] > 0:
 
         if players_turn:
-            turn_damage = random.randint((player["damage"]-5), player["damage"])*(player["speed"]/10)
-            the_enemy["health"] = the_enemy["health"] - turn_damage*(1-(the_enemy["defense"]/100))
+            turn_damage = int(random.randint((player["damage"]-5), player["damage"])*(player["speed"]/10))
+            the_enemy["health"] = int(the_enemy["health"] - turn_damage*(1-(the_enemy["defense"]/100)))
             players_turn = False
 
             health_bar(player, the_enemy)        
@@ -491,10 +493,10 @@ def battle_mode(mode):
             print_centered(f"{the_enemy['name']}'s Heath is {the_enemy['health']}", width)
             print()
             time.sleep(3)
-            os.system('clear')
+            # os.system('clear')
         else:
-            turn_damage = random.randint((the_enemy["damage"]-5), the_enemy["damage"])   *(the_enemy["speed"]/10)
-            player["health"] = player["health"] - turn_damage*(1-(player["defense"]/100))
+            turn_damage = int(random.randint((the_enemy["damage"]-5), the_enemy["damage"])   *(the_enemy["speed"]/10))
+            player["health"] = int(player["health"] - turn_damage*(1-(player["defense"]/100)))
             health_bar(player, the_enemy)   
             print_centered(f"==== {the_enemy['name']}'s Turn ====", width)
             print_centered(f"{the_enemy['name']} Deals {turn_damage} Dmg", width)
@@ -503,7 +505,7 @@ def battle_mode(mode):
 
             players_turn = True
             time.sleep(3)
-            os.system("clear")
+            # os.system("clear")
 
 
     if player['health'] <= 0:
@@ -698,7 +700,7 @@ def attack_msg(attacker, defender, turn_damage):
 
 ############################# PRINTS HEALTH BAR ####################################################
 def health_bar(player_one, player_two):
-    os.system('clear')
+    # os.system('clear')
     print("".rjust(20),f"======== {player_one['name']}: {player_one['health']} ========================== {player_two['name']}: {player_two['health']} ======== \n\n\n\n")
 
 ############################# PRINTS  Starting Battle Message ####################################################
