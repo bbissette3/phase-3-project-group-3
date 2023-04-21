@@ -1,6 +1,11 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, MetaData
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+import os
+
+width = os.get_terminal_size().columns
+width = int((width - 30)/2)
+r_align = "".rjust(width)
 
 convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -66,16 +71,16 @@ class Character(Base):
     user_id = Column(Integer(), ForeignKey("users.id"))
 
     def __repr__(self):
-        return f"Name: {self.name}, \n" \
-            + f"====== Stats ====== \n" \
-            + f"Defense: Base-{self.defense} Total({self.defense + self.armor.defense + self.specialty.defense}) \n" \
-            + f"Damage: Base-{self.damage} Total({self.damage + self.weapon.damage + self.specialty.damage})\n" \
-            + f"Health: Base-{self.health} Total({self.health})\n" \
-            + f"Speed: Base-{self.speed} Total({self.speed + self.armor.speed + self.weapon.speed}) \n" \
-            + f"==== Equip \ Specialty ==== \n" \
-            + f"Armor= {self.armor}, \n" \
-            + f"Weapon= {self.weapon}, \n" \
-            + f"Speialty= {self.specialty}, \n" \
+        return r_align + f"Name: {self.name} \n" \
+            + r_align + f"====== Stats ====== \n" \
+            + r_align + f"Defense: Base-{self.defense} Total({self.defense + self.armor.defense + self.specialty.defense}) \n" \
+            + r_align + f"Damage: Base-{self.damage} Total({self.damage + self.weapon.damage + self.specialty.damage})\n" \
+            + r_align + f"Health: Base-{self.health} Total({self.health})\n" \
+            + r_align + f"Speed: Base-{self.speed} Total({self.speed + self.armor.speed + self.weapon.speed}) \n" \
+            + r_align + f"==== Equip \ Specialty ==== \n" \
+            + r_align +f"Armor= {self.armor}, \n" \
+            + r_align +f"Weapon= {self.weapon}, \n" \
+            + r_align + f"Speialty= {self.specialty}, \n" \
 
     
 class User(Base):
@@ -86,4 +91,4 @@ class User(Base):
     characters = relationship("Character", backref="user")
 
     def __repr__(self):
-        return f"Username: {self.username}"
+        return r_align +f"Username: {self.username}"
