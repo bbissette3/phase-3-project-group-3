@@ -58,15 +58,15 @@ def start_menu(session):
     print_centered("--- Select an Option ---", width)
     print(r_align, "1. Create New Account")
     print(r_align, "2. Login to Account")
-    print(r_align, "Please Enter 1, 2, or q")
+    print(r_align, "Please Enter 1, 2, or q - to quit")
     
-    response = get_user_input(["1", "2", "q"], width)
+    response = get_user_input(["1", "2", "Q"], width)
 
     if response == "1":
         create_account()
     elif response == "2":
         log_in(True)
-    elif response == "q":
+    elif response == "Q":
         return
 
 
@@ -328,7 +328,7 @@ def update_character():
             print_centered(character, width)
             print()
 
-        print_centered("==Type in Character to Update==", width)
+        print_centered("==Type in Character Name to Update==", width)
         response = get_user_input(character_list, width)
         
         update_character_name = user_session.query(Character).filter(Character.name== response).first()
@@ -592,7 +592,7 @@ def the_arena():
     # represents key pressed by client
 
     if user_character:
-        player_two = enemy_generator('3')
+        player_two = enemy_generator('2')
 
         player_one = {
             'name': user_character.name,
@@ -704,7 +704,7 @@ def attack_msg(attacker, defender, turn_damage):
     if(turn_damage[1] > 0):
         print(f"!!! {defender['name']} IS POISONED !!! \n")
         print(f"{defender['name']} suffers {turn_damage[1]} Poison Dmg.\n")
-    print(f"{defender['name']}'s Heath is {defender['health']} \n \n"
+    print(f"{defender['name']}'s Health is {defender['health']} \n \n"
     )
     # time.sleep(3)
 
@@ -769,6 +769,13 @@ def players_turn(player_one, player_two):
         
         health_bar(player_one, player_two)        
         print_grid(player_one, player_two)
+
+        print("Use W, A, S, D and press Enter to Move")
+        print("When next to Enemy Type Attack to Attack Enemy")
+        print("You must type and press Enter to end your turn")
+        print()
+        print("You are the 🦸‍♂️")
+
         attack_msg(player_one, player_two, turn_damage)
         print(f"==== Movement: {player_one['movement']} == Attacks: {player_one['attacks']}")
         print("---Select an Option ---")
@@ -874,6 +881,9 @@ def cpu_movement(player_cpu, player_one):
 def print_grid(player_one, player_two):
 #These are two loops. The first one represents the rows in the grid
 #All it does is print a new line. The 2nd prints each space in in the row or column
+    print('┌' + '─' * 51 + '┐')
+
+
     for row in range(11):
         for column in range(51):
 
@@ -881,9 +891,11 @@ def print_grid(player_one, player_two):
 # The [0] index represents the row position of player_one and the [1] the column
 # The first if statement checks if row $ column match with player_one and enemies [0] & [1] index
 # If they do they print an X to represent the player_one or enemy 
-            if((row == player_one['position'][0] and column == player_one['position'][1]) or
-            (row == player_two['position'][0] and column == player_two['position'][1]) ):  
-                print("X", end='')
+            if(row == player_one['position'][0] and column == player_one['position'][1]):  
+                print("🦸‍♂️", end='')
+
+            if(row == player_two['position'][0] and column == player_two['position'][1]):  
+                print("🤖", end='')
 
 # This is a dumb feature I included. which is suppose to visually represent how much movement
 # The player_one has. User[mode] reprsents if player_one is in attack mode or movement mode. Entering 'm' puts
@@ -897,7 +909,9 @@ def print_grid(player_one, player_two):
 
 # This just prints out a generic  '.' to represent an empty space  
             else:
-                print(".", end='')
+                print(" ", end='')
 
 # This prints out the new line so when the first for loop repeats it will create a new row
         print("")
+
+    print('└' + '─' * 51 + '┘')
