@@ -20,6 +20,8 @@ def input_centered(terminal_width):
 
 def get_user_input(choices, terminal_width):
 
+    print (choices)
+
     response = input_centered(terminal_width).title()
     if 1 <= len(response) <= 25 and choices == True or response in choices:
         return response
@@ -29,7 +31,7 @@ def get_user_input(choices, terminal_width):
 
 def print_centered(text, terminal_width):
     padding = (terminal_width - len(text)) // 2
-    print(" " * padding + text + " " * (terminal_width - len(text) - padding))
+    print(" " * padding + text)
 
 def print_box(text, width, terminal_width):
     padding = (terminal_width - width) // 2
@@ -44,6 +46,7 @@ width = os.get_terminal_size().columns
 half = int((width -25)/2)
 r_align = "".rjust(half)
 a_align = "".rjust(int((width-45)/2))
+b_align = "".rjust(int((width-80)/2))
 
 ########################################
 #Login Section
@@ -243,7 +246,7 @@ def create_character():
         print_centered(armor_string, width)
 
     print()
-    selected_armor_name = get_user_input((armor.name for armor in user_session.query(Armor)), width)
+    selected_armor_name = get_user_input([armor.name for armor in user_session.query(Armor)], width)
 
     selected_armor = user_session.query(Armor).filter(Armor.name == selected_armor_name).first()
     print_centered(f"You have selected {selected_armor}.", width)
@@ -628,7 +631,7 @@ def the_arena():
             'attacks': "active",
             'crit_strike': 1,
             'status': ['normal', 0],
-            'mode': 'move',
+            'mode': 'm',
             'turn': False,
             'hurt': False
         }
@@ -820,9 +823,9 @@ def players_turn(player_one, player_two):
         health_bar(player_one, player_two)        
         print_grid(player_one, player_two)
         attack_msg(player_one, player_two, turn_damage)
-        print(f"==== Movement: {player_one['movement']} == Attacks: {player_one['attacks']}")
-        print("---Select an Option ---")
-        print("Enter a key:  ")
+        print(b_align, f"==== Movement: {player_one['movement']} == Attacks: {player_one['attacks']}")
+        print(b_align,"---Select an Option ---")
+        print(b_align,"Enter a key:  ")
         key = input()
 
 #########################  This Function Hands Over Control to The Computer #########################################
@@ -851,8 +854,8 @@ def cpu_turn(player_cpu, player_one):
         if start:
             start = False
             if player_cpu['status'][0] == 'stunned':
-                print(f"{player_cpu['name']} Has Been Stunned")
-                print(colorama.Fore.YELLOW + f"{player_cpu['name']} Loses It's Turn" + colorama.Style.RESET_ALL)
+                print(b_align,f"{player_cpu['name']} Has Been Stunned")
+                print(b_align, colorama.Fore.YELLOW + f"{player_cpu['name']} Loses It's Turn" + colorama.Style.RESET_ALL)
                 player_cpu['turn'] = False
                 player_one['turn'] = True
                 player_cpu['status'][0] = 'normal'
@@ -862,7 +865,7 @@ def cpu_turn(player_cpu, player_one):
                 poisoned_dmg = 5
                 player_cpu['health'] -= 5
                 player_cpu['status'][1] = player_cpu['status'][1] - 1
-                print(colorama.Fore.RED + f"{player_cpu['name']} has suffered 5 Poison damage" + colorama.Style.RESET_ALL)
+                print(b_align, colorama.Fore.RED + f"{player_cpu['name']} has suffered 5 Poison damage" + colorama.Style.RESET_ALL)
               
                 time.sleep(2)
 
@@ -947,10 +950,11 @@ def cpu_movement(player_cpu, player_one):
 def print_grid(player_one, player_two):
 #These are two loops. The first one represents the rows in the grid
 #All it does is print a new line. The 2nd prints each space in in the row or column
-    print('┌' + '─' * 51 + '┐')
+    print(b_align,'┌' + '─' * 51 + '┐')
 
 
     for row in range(11):
+        print(b_align, end='')
         for column in range(51):
 
 # 'position' is a dict key value in User with a value pair that a list with 2 indexes.
@@ -969,9 +973,9 @@ def print_grid(player_one, player_two):
 # movement and so choosing 'a' for both moving right and attack mode was dumb). Anyways if you
 # 3 movement then it prints out a ^ symbol for any square thats 3 places away from you. so you
 # how far you can actually movement
-            elif((player_one['mode'] == 'm') and 
-                ((abs(row - player_one['position'][0]) + abs(column - player_one['position'][1])) <= player_one['movement'])):
-                print("^", end='')
+            # elif((player_one['mode'] == 'm') and 
+            #     ((abs(row - player_one['position'][0]) + abs(column - player_one['position'][1])) <= player_one['movement'])):
+            #     print("^", end='')
 
 # This just prints out a generic  '.' to represent an empty space  
             else:
@@ -980,4 +984,4 @@ def print_grid(player_one, player_two):
 # This prints out the new line so when the first for loop repeats it will create a new row
         print("")
 
-    print('└' + '─' * 51 + '┘')
+    print(b_align, '└' + '─' * 51 + '┘')
